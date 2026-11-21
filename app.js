@@ -38,7 +38,7 @@ function render(){
  const i=Number(index);if(![0,1].includes(i)||i>done){location.replace('#'+path);return}
  if(b.id==='pinokyo' && i===0){location.replace('pinokyo/index.html');return}
  const s=b.stops[i],quiz=n===i*2+1;
- screen.innerHTML=back(path,'Kitap patikası')+`<article class="panel"><small class="eyebrow">${b.name} · ${i+1}. durak · ${quiz?'2/2':'1/2'}</small><div class="track"><i style="width:${quiz?100:50}%"></i></div><h2>${quiz?'Hikâyeyi hatırla':s[0]}</h2><img class="scene" src="${asset(b.id+'-'+(i+1))}" alt=""><p>${quiz?s[2]:s[1]}</p>${quiz?`<div class="options">${(i===0?[4,3]:[3,4]).map(k=>`<button data-answer="${k}">${s[k]}</button>`).join('')}</div><p class="status" role="status"></p>`:i<done?btn(path,'Patikaya dön'):'<button class="cta primary" data-read>Soruya geç</button>'}</article>`;
+ screen.innerHTML=`<div class="activity-tools">${back(path,'Kitap patikası')}<button type="button" data-skip>Demoyu geç</button></div><article class="panel"><small class="eyebrow">${b.name} · ${i+1}. durak · ${quiz?'2/2':'1/2'}</small><div class="track"><i style="width:${quiz?100:50}%"></i></div><h2>${quiz?'Hikâyeyi hatırla':s[0]}</h2><img class="scene" src="${asset(b.id+'-'+(i+1))}" alt=""><p>${quiz?s[2]:s[1]}</p>${quiz?`<div class="options">${(i===0?[4,3]:[3,4]).map(k=>`<button data-answer="${k}">${s[k]}</button>`).join('')}</div><p class="status" role="status"></p>`:i<done?btn(path,'Patikaya dön'):'<button class="cta primary" data-read>Soruya geç</button>'}</article>`;
  }else if(route==='sonuc'){
  screen.innerHTML=`<div class="panel"><small class="eyebrow">Okuma pasaportu</small><h1>Damgan hazır!</h1><div class="stamp">✦ &nbsp; ${b.name} · ${done}. durak</div><p>${done===1?'İkinci durağın açıldı.':'Bu kitabın iki örnek durağını tamamladın.'}</p>${btn(path,'Patikayı gör')}</div>`;
  }else if(route==='pasaport'){
@@ -48,6 +48,14 @@ function render(){
  }
  screen.onclick=e=>{const t=e.target.closest('button');if(!t)return;
  if(t.dataset.filter){filter=t.dataset.filter;render();screen.querySelector('[aria-pressed=true]').focus();return}
+ if(t.hasAttribute('data-skip')){
+   const stop=Number(index);
+   if(stop<done){location.hash=path;return}
+   state.steps[b.id]=n+1;
+   save();
+   if(n%2===1){location.hash='sonuc/'+b.id}else{render();screen.focus()}
+   return;
+ }
  if(t.hasAttribute('data-read')){state.steps[b.id]=n+1;save();render();screen.focus();return}
  if(t.dataset.answer){if(t.dataset.answer==='3'){state.steps[b.id]=n+1;save();location.hash='sonuc/'+b.id}else{screen.querySelector('.status').textContent='Bir kez daha düşün. '+b.stops[Number(index)][1];t.disabled=true}}
  };

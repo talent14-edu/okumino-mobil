@@ -65,3 +65,5 @@ body{font-weight:700;color:#514b6b;background:var(--page)}
 .film-frame.laughter-moment::after{top:26%;right:12%;font-size:clamp(17px,3vw,29px);padding:10px 17px}
 @media(max-width:540px){.scene-card[data-scene=laugh]::after{left:35px;right:auto;top:8px;font-size:9px;padding:2px 5px;border-width:1px;border-radius:8px}}
 .path-exit{align-self:center;text-decoration:none;font:800 14px var(--ui);color:#54386e;padding:8px;border-radius:12px;background:#f4e9ff}.fullscreen-tool{display:none!important}
+#demoSkip{border:1px solid #d4c3df;border-radius:12px;background:#f6effa;color:#604378;font:800 13px var(--ui);padding:8px;cursor:pointer;min-height:40px}#demoSkip[hidden]{display:none}
+@media(min-width:901px) and (min-height:481px){.footer-buttons{flex-wrap:wrap}#demoSkip{flex:1 0 100%}}

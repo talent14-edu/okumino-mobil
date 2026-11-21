@@ -91,7 +91,7 @@ Kuklanın ayakları henüz hazır değildi. Gepetto onu yeniden tezgâha oturttu
     return `<div class="screen film-screen entering"><div class="film-top"><h1 class="screen-title">Senin küçük filmin.</h1><span>${filmIndex + 1} / 3 sahne</span></div><div class="film-frame ${scene.id === 'laugh' ? 'laughter-moment' : ''} ${filmPlaying && !reduced.matches ? 'playing' : ''}"><img src="assets/${scene.id}.webp" alt="${scene.label}" width="1024" height="768"></div><p class="film-caption" aria-live="polite">${scene.caption}</p><div class="film-controls"><button class="text-tool" data-action="film-play">${icon(filmPlaying ? 'pause' : 'play')} ${filmPlaying ? 'Duraklat' : state.filmSeen && filmIndex === 2 ? 'Yeniden izle' : 'Oynat'}</button><span class="film-dots" aria-hidden="true">${scenes.map((_, index) => `<i class="${index === filmIndex ? 'active' : ''}"></i>`).join('')}</span><button class="text-tool" data-action="film-next">${filmIndex < 2 ? 'Sonraki kare' : 'Bitir'} ${icon('arrow')}</button></div></div>`;
   }
   function renderCompletion() {
-    return `<div class="screen completion-screen entering"><img src="assets/mino.webp" width="180" height="210" alt="Mino kitabını tutuyor"><p class="completion-kicker">ATÖLYEDEKİ İLK SÜRPRİZ</p><h1 class="screen-title">İlk adımı tamamladın.</h1><p>Üç kelime keşfettin, hikâyeyi okudun<br>ve olayları kendi filminle anlattın.</p><div class="completion-chips"><span>${icon('check')} Kelimeler</span><span>${icon('check')} Hikâye</span><span>${icon('check')} İpuçları</span></div><p>Acaba Pinokyo’nun ayakları tamamlanınca<br>atölyede neler olacak?</p><button class="quiet-button" data-action="reset-dialog">Bu adımı yeniden keşfet</button></div>`;
+    return `<div class="screen completion-screen entering"><img src="assets/mino.webp" width="180" height="210" alt="Mino kitabını tutuyor"><p class="completion-kicker">ATÖLYEDEKİ İLK SÜRPRİZ</p><h1 class="screen-title">İlk adımı tamamladın.</h1><p>${state.previewUsed ? "Atölye demosunun sonuna geldin. İkinci durağı keşfedebilirsin." : "Üç kelime keşfettin, hikâyeyi okudun<br>ve olayları kendi filminle anlattın."}</p><div class="completion-chips"><span>${icon('check')} Kelimeler</span><span>${icon('check')} Hikâye</span><span>${icon('check')} İpuçları</span></div><p>Acaba Pinokyo’nun ayakları tamamlanınca<br>atölyede neler olacak?</p><button class="quiet-button" data-action="reset-dialog">Bu adımı yeniden keşfet</button></div>`;
   }
   function render(focus = false) {
     clearTimeout(filmTimer);
@@ -126,6 +126,7 @@ Kuklanın ayakları henüz hazır değildi. Gepetto onu yeniden tezgâha oturttu
     const next = $('#next');
     const text = state.stage === 0 ? 'Kelimeleri keşfet' : state.stage === 1 ? state.vocabIndex < 2 ? 'Sonraki kelime' : 'Hikâyeyi aç' : state.stage === 2 ? 'İpucunu bul' : state.stage === 3 ? state.detectPart === 0 ? 'Kanıtını bul' : 'Sesini kat' : state.stage === 4 ? 'Filmini kur' : state.stage === 5 ? filmMode ? 'Adımı tamamla' : state.orderChecked ? 'Özetini izle' : 'Kontrol et' : 'Patikaya dön';
     next.innerHTML = `<span>${text}</span>${icon('arrow')}`;
+    $('#demoSkip').hidden = state.stage === 6;
     next.disabled = !canAdvance();
     $('#previous').disabled = state.stage === 0;
     $('#progressText').textContent = state.stage === 6 ? 'Adım tamamlandı' : `${state.stage + 1} / 6 etkinlik`;
@@ -154,7 +155,7 @@ Kuklanın ayakları henüz hazır değildi. Gepetto onu yeniden tezgâha oturttu
     if (state.stage === 1 && state.vocabIndex < 2) { state.vocabIndex++; render(true); return; }
     if (state.stage === 3 && state.detectPart === 0) { state.detectPart = 1; render(true); return; }
     if (state.stage === 5) {
-      if (!state.orderChecked) {
+      if (!filmMode && !state.orderChecked) {
         if (state.order.join(',') !== 'eyes,laugh,wig') { const node = $('#orderFeedback'); node.textContent = 'Önce gözler mi hareket etmişti, yoksa peruk mu çekilmişti? Sıranı yeniden gözden geçir.'; node.className = 'feedback hint'; return; }
         state.orderChecked = true; render(); return;
       }
@@ -303,6 +304,15 @@ Kuklanın ayakları henüz hazır değildi. Gepetto onu yeniden tezgâha oturttu
     if (!target || target.disabled) return;
     const action = target.dataset.action, value = Number(target.dataset.value);
     switch (action) {
+      case 'demo-skip':
+        state.previewUsed = true;
+        if (state.stage === 5 && !filmMode) {
+          filmMode = true; filmIndex = 0; filmPlaying = !reduced.matches;
+          render(true);
+        } else {
+          go(state.stage + 1);
+        }
+        break;
       case 'intro-choice': state.introChoice = value; render(); break;
       case 'word-choice': state.vocabAnswers[state.vocabIndex] = value; render(); break;
       case 'detect-choice': state.detectAnswers[state.detectPart] = value; render(); break;
