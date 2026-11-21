@@ -111,3 +111,48 @@ nav a[aria-current=page] img{transform:translateY(-3px) scale(1.12)}
  .unit h1{font-size:26px}
 }
 .toast{white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+/* Okumino ikonları (emoji yerine) */
+.ic{display:inline-block;width:1.3em;height:1.3em;vertical-align:-.3em;object-fit:contain}
+.badge span .ic{width:46px;height:46px}.big-emoji .ic{width:76px;height:76px}
+.node img,.node .ic{width:46px;height:46px}.node.locked .ic{width:40px;height:40px}
+.note-icon .ic{width:34px;height:34px}.log-dot .ic{width:26px;height:26px}.mode-icon .ic{width:42px;height:42px}
+.push b .ic{width:20px;height:20px}.task img{width:44px;height:44px}
+
+/* Hoş geldin: sıcak okuma odası */
+body[data-route=hosgeldin] header,body[data-route=hosgeldin] nav{display:none}
+body[data-route=hosgeldin] .shell{padding:0;max-width:none;background:none;box-shadow:none}
+.welcome{position:fixed;inset:0;overflow:hidden;display:flex;flex-direction:column;align-items:center;background:#7a4a24 url(assets/oda_gunduz.webp) center 38%/cover;color:#fff}
+.welcome.night{background-image:url(assets/oda_gece.webp)}
+.welcome:before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#2a14055c 0,transparent 32%,transparent 58%,#2a140585 100%);pointer-events:none}
+.welcome>*{position:relative}
+.w-top{align-self:flex-start;margin:14px 16px 0;padding:8px 12px;border-radius:18px;background:#fff7ea}
+.w-top img{display:block;width:110px}
+.welcome h1{margin:2vh 16px 0;max-width:13em;text-align:center;font:800 clamp(34px,6.4vw,64px)/1.05 Baloo,system-ui;text-shadow:0 3px 0 #0000002e,0 6px 22px #00000059;color:#fff}
+.welcome h1 span{color:#ffc21a}
+.w-shelf{position:absolute;left:50%;bottom:31%;transform:translateX(-50%);display:flex;align-items:flex-end;gap:5px;height:clamp(170px,30vh,280px)}
+.w-cover{height:100%;flex:none;border-radius:6px 12px 12px 6px;overflow:hidden;box-shadow:4px 8px 14px #0000005c;transform:rotate(-2deg);transition:transform .2s}
+.w-cover img{height:100%;aspect-ratio:2/3;object-fit:cover;display:block}
+.w-cover:active{transform:rotate(-2deg) scale(.97)}
+.spine{position:relative;flex:none;width:clamp(30px,3.4vw,44px);height:var(--h);padding:22px 0 8px;border:0;border-radius:4px 4px 2px 2px;background:var(--c);color:#fff;box-shadow:inset -5px 0 0 #00000024,inset 4px 0 0 #ffffff26,3px 6px 10px #0000004d;display:flex;flex-direction:column;align-items:center;gap:8px;font:inherit;cursor:pointer;text-decoration:none}
+.spine:before{content:'✦';position:absolute;top:4px;font-size:11px;color:#fff6}
+.spine:after{content:'';position:absolute;left:0;right:0;top:17px;height:3px;background:#ffffff59}
+.spine b,.spine small{writing-mode:vertical-rl;white-space:nowrap;overflow:hidden}
+.spine b{font:800 clamp(12px,1.5vw,17px) Baloo;flex:1}.spine small{font-size:10px;opacity:.85}
+.spine.soon{filter:saturate(.75) brightness(.92)}
+.spine:active{transform:translateY(-6px)}
+.w-mino{position:absolute;left:max(2vw,6px);bottom:9%;width:clamp(120px,22vw,250px);animation:wave 2.8s ease-in-out infinite;transform-origin:50% 100%}
+.w-hello{position:absolute;left:max(2vw,10px);bottom:calc(9% + clamp(150px,28vw,320px));margin:0;max-width:230px;padding:8px 12px;border-radius:16px 16px 16px 4px;background:#fffdf7;color:#3d3348;font:600 16px/1.3 Baloo,system-ui;box-shadow:0 4px 0 #0000001f}
+.w-actions{position:absolute;bottom:4%;left:50%;transform:translateX(-50%);display:flex;gap:12px;flex-wrap:wrap;justify-content:center;width:min(92vw,620px)}
+.w-actions .cta{font-size:19px;padding:13px 20px;text-align:center}
+@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-3deg) translateY(-4px)}}
+@media(max-width:600px){
+ .welcome{background-position:52% 40%}
+ .welcome h1{font-size:34px;margin-top:3vh}
+ .w-shelf{bottom:40%;height:min(27vh,200px);gap:4px}
+ .w-shelf .spine:nth-of-type(n+5){display:none}
+ .w-mino{width:112px;bottom:19%;left:6px}
+ .w-hello{left:116px;bottom:calc(19% + 70px);max-width:210px;font-size:15px}
+ .w-actions{flex-direction:column;align-items:stretch;width:calc(100% - 32px)}
+ .w-actions .cta{font-size:18px}
+}
+@media(prefers-reduced-motion:reduce){.w-mino{animation:none}}

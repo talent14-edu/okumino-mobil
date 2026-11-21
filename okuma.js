@@ -1,6 +1,6 @@
 // Ekran parçaları: kendi hızında okuma, serbest etkinlikler, profil, fidan, rozetler.
 const workshopLabels = ['Hayal et', 'Kelime sandığı', 'Hikâye zamanı', 'Dedektif Mino', 'Ses stüdyosu', 'Filmini kur'];
-const workshopIcons = ['light_bulb', 'books', 'open_book', 'magnifier', 'microphone', 'clapper'];
+const workshopIcons = ['dusunce', 'kitaplar', 'kitap', 'buyutec', 'hoparlor', 'yildiz'];
 
 function readerLink(b) { return 'oku/' + b.id + '/' + Journal.bookmark(b.id); }
 function bookPagesRead(id) { return Journal.entries().filter(e => e.book === id && e.type === 'page').length; }
@@ -40,15 +40,15 @@ function badgeList(sum, steps) {
   const finished = books.filter(b => bookPagesRead(b.id) >= readerBooks[b.id].length).length;
   const stamps = books.reduce((n, b) => n + Math.floor(Math.min(4, Number(steps[b.id]) || 0) / 2), 0);
   return [
-    {icon: '💧', title: 'İlk damla', have: sum.pages, need: 1, hint: 'İlk sayfanı oku'},
-    {icon: '📖', title: 'Sayfa dostu', have: sum.pages, need: 10, hint: '10 sayfa oku'},
-    {icon: '🔎', title: 'Meraklı kâşif', have: sum.tasks, need: 1, hint: 'Bir etkinlik bitir'},
-    {icon: '🧩', title: 'Etkinlik ustası', have: sum.tasks, need: 6, hint: '6 etkinlik bitir'},
-    {icon: '🏅', title: 'Patika damgası', have: stamps, need: 1, hint: 'Bir patika durağı bitir'},
-    {icon: '🐛', title: 'Kitap kurdu', have: finished, need: 1, hint: 'Bir kitabı sonuna kadar oku'},
-    {icon: '🔥', title: '3 gün seri', have: sum.streak, need: 3, hint: '3 gün üst üste oku'},
-    {icon: '🌳', title: 'Bahçıvan', have: sum.streak, need: 7, hint: '7 gün üst üste oku'},
-    {icon: '🧭', title: 'Raf gezgini', have: sum.books, need: 4, hint: '4 farklı kitaptan oku'}
+    {icon: '<img class="ic" src="assets/ikon/damla.png" alt="">', title: 'İlk damla', have: sum.pages, need: 1, hint: 'İlk sayfanı oku'},
+    {icon: '<img class="ic" src="assets/ikon/kitap.png" alt="">', title: 'Sayfa dostu', have: sum.pages, need: 10, hint: '10 sayfa oku'},
+    {icon: '<img class="ic" src="assets/ikon/buyutec.png" alt="">', title: 'Meraklı kâşif', have: sum.tasks, need: 1, hint: 'Bir etkinlik bitir'},
+    {icon: '<img class="ic" src="assets/ikon/yapboz.png" alt="">', title: 'Etkinlik ustası', have: sum.tasks, need: 6, hint: '6 etkinlik bitir'},
+    {icon: '<img class="ic" src="assets/ikon/madalya.png" alt="">', title: 'Patika damgası', have: stamps, need: 1, hint: 'Bir patika durağı bitir'},
+    {icon: '<img class="ic" src="assets/ikon/kitapkurdu.png" alt="">', title: 'Kitap kurdu', have: finished, need: 1, hint: 'Bir kitabı sonuna kadar oku'},
+    {icon: '<img class="ic" src="assets/ikon/alev.png" alt="">', title: '3 gün seri', have: sum.streak, need: 3, hint: '3 gün üst üste oku'},
+    {icon: '<img class="ic" src="assets/ikon/agac.png" alt="">', title: 'Bahçıvan', have: sum.streak, need: 7, hint: '7 gün üst üste oku'},
+    {icon: '<img class="ic" src="assets/ikon/pusula.png" alt="">', title: 'Raf gezgini', have: sum.books, need: 4, hint: '4 farklı kitaptan oku'}
   ].map(b => ({...b, on: b.have >= b.need}));
 }
 
@@ -61,8 +61,8 @@ function todayCard(sum, b) {
   <div class="mino-say"><img src="pinokyo/assets/mino.webp" alt="Mino"><p class="bubble">${hello}</p></div>
   <div class="today-main"><a class="today-plant" href="#profil" aria-label="Fidanımı gör">${plantSVG(sum, 'mini')}<span>${sum.stage.name}</span></a>
   <div class="today-body"><div class="drops" aria-label="Bugün ${sum.todayDrops} / ${sum.goal} damla">${Array.from({length: sum.goal}, (_, i) => `<i class="${i < sum.todayDrops ? 'full' : ''}"></i>`).join('')}</div>
-  <p class="streak-line">${sum.streak ? '🔥 <b>' + sum.streak + ' gün</b> üst üste okudun' : '🌱 Bugün okursan serin başlar'}</p>
-  ${btn(readerLink(b), '📖 ' + (Journal.bookmark(b.id) ? 'Kaldığın yerden: ' : 'Okumaya başla: ') + b.name, 'cta primary big')}</div></div></section>`;
+  <p class="streak-line">${sum.streak ? '<img class="ic" src="assets/ikon/alev.png" alt=""> <b>' + sum.streak + ' gün</b> üst üste okudun' : '<img class="ic" src="assets/ikon/fidan.png" alt=""> Bugün okursan serin başlar'}</p>
+  ${btn(readerLink(b), '<img class="ic" src="assets/ikon/kitap.png" alt=""> ' + (Journal.bookmark(b.id) ? 'Kaldığın yerden: ' : 'Okumaya başla: ') + b.name, 'cta primary big')}</div></div></section>`;
 }
 function homeScreen(sum, readBook, pathBook, steps) {
   const done = Math.floor(Math.min(4, Number(steps[pathBook.id]) || 0) / 2);
@@ -84,7 +84,7 @@ function pathScreen(b, done) {
     const x = ZIGZAG[i % ZIGZAG.length], side = x > 0 ? 'left' : 'right';
     const chest = i === 3, last = i === b.total - 1;
     const kind = last ? 'trophy' : chest ? 'chest' : 'stop';
-    const face = isDone ? '✓' : last ? '🏆' : chest ? '🎁' : isNow ? '<img src="pinokyo/assets/icons/open_book.png" alt="">' : '⭐';
+    const face = isDone ? '✓' : last ? '<img class="ic" src="assets/ikon/kupa.png" alt="">' : chest ? '<img class="ic" src="assets/ikon/sandik.png" alt="">' : isNow ? '<img src="assets/ikon/kitap.png" alt="">' : '<img class="ic" src="assets/ikon/yildiz.png" alt="">';
     const title = playable ? b.stops[i][0] : last ? 'Kitap kupası' : chest ? 'Hazine sandığı' : '';
     const label = isNow ? `<div class="path-mino ${side}"><img src="pinokyo/assets/mino.webp" alt=""><span>${title}</span></div>` : title && (isDone || kind !== 'stop') ? `<span class="node-label ${side}">${title}</span>` : '';
     const node = isDone || isNow
@@ -95,7 +95,7 @@ function pathScreen(b, done) {
   const switcher = books.map(x => `<a href="#patika/${x.id}" class="sw ${x.id === b.id ? 'on' : ''}" aria-label="${x.name} patikası"><img src="${asset(x.id)}" alt=""></a>`).join('');
   return `<div class="path-page"><aside class="path-side"><div class="unit"><img src="${asset(b.id)}" alt=""><div><small>${b.level.toLocaleUpperCase('tr')} · ${b.total} DURAK</small><h1>${b.name}</h1><div class="unit-bar"><i style="width:${done / b.total * 100}%"></i></div><small>${done}/${b.total} durak tamam</small></div></div>
   <div class="switcher" aria-label="Kitap değiştir">${switcher}</div>
-  <div class="side-tips">${btn('kitap/' + b.id, '📖 Kendi hızımda oku', 'cta')}${done ? btn('pasaport', '🏅 Damgalarım', 'cta soft') : ''}</div></aside>
+  <div class="side-tips">${btn('kitap/' + b.id, '<img class="ic" src="assets/ikon/kitap.png" alt=""> Kendi hızımda oku', 'cta')}${done ? btn('pasaport', '<img class="ic" src="assets/ikon/madalya.png" alt=""> Damgalarım', 'cta soft') : ''}</div></aside>
   <div class="path">${steps.join('')}</div></div>`;
 }
 
@@ -103,8 +103,8 @@ function bookModes(b, n) {
   const length = readerBooks[b.id].length, read = bookPagesRead(b.id);
   const tasks = Journal.entries().filter(e => e.book === b.id && e.type === 'task').length;
   return `<div class="mode-grid">
-  <section class="mode solo"><span class="mode-icon" aria-hidden="true">📖</span><small class="eyebrow">KENDİ HIZIMDA</small><h2>Kitabı oku</h2><p>${length} sayfa${b.id === 'pinokyo' ? '' : ' · örnek bölüm'}. Her sayfa fidanına 1 damla.</p><div class="minibar"><i style="width:${read / length * 100}%"></i></div><small class="muted">${read}/${length} sayfa okundu</small>${btn(readerLink(b), Journal.bookmark(b.id) ? 'Kaldığın yerden' : 'Okumaya başla')}</section>
-  <section class="mode solo"><span class="mode-icon" aria-hidden="true">🧩</span><small class="eyebrow">İSTEDİĞİM SIRAYLA</small><h2>Etkinlik seç</h2><p>Sırayı sen seç. Her etkinlik 2 damla.</p><small class="muted">${tasks} etkinlik tamamlandı</small>${btn('etkinlikler/' + b.id, 'Etkinliklere bak', 'cta')}</section>
+  <section class="mode solo"><span class="mode-icon" aria-hidden="true"><img class="ic" src="assets/ikon/kitap.png" alt=""></span><small class="eyebrow">KENDİ HIZIMDA</small><h2>Kitabı oku</h2><p>${length} sayfa${b.id === 'pinokyo' ? '' : ' · örnek bölüm'}. Her sayfa fidanına 1 damla.</p><div class="minibar"><i style="width:${read / length * 100}%"></i></div><small class="muted">${read}/${length} sayfa okundu</small>${btn(readerLink(b), Journal.bookmark(b.id) ? 'Kaldığın yerden' : 'Okumaya başla')}</section>
+  <section class="mode solo"><span class="mode-icon" aria-hidden="true"><img class="ic" src="assets/ikon/yapboz.png" alt=""></span><small class="eyebrow">İSTEDİĞİM SIRAYLA</small><h2>Etkinlik seç</h2><p>Sırayı sen seç. Her etkinlik 2 damla.</p><small class="muted">${tasks} etkinlik tamamlandı</small>${btn('etkinlikler/' + b.id, 'Etkinliklere bak', 'cta')}</section>
   <section class="mode path"><img src="pinokyo/assets/mino.webp" alt="" class="mode-mino"><small class="eyebrow">MİNO İLE</small><h2>Patikayı izle</h2><p>Durakları sırayla geç, her durakta pasaportuna damga kazan.</p>${btn('patika/' + b.id, n ? 'Patikama dön' : 'Patikaya başla')}</section></div>`;
 }
 
@@ -114,8 +114,8 @@ function reader(b, index) {
   Journal.bookmark(b.id, i);
   const done = Journal.has(b.id, 'page', 'p' + i);
   const font = readerFont();
-  return `<div class="reader-top">${back('kitap/' + b.id, b.name)}<div class="reader-tools"><button type="button" data-font="-1" aria-label="Yazıyı küçült">A−</button><button type="button" data-font="1" aria-label="Yazıyı büyüt">A+</button><button type="button" data-listen aria-label="Sayfayı dinle">🔊 Dinle</button></div></div>
-  <article class="panel reading ${img ? 'has-img' : ''}" style="--fs:${font}px"><div class="page-meta"><small class="eyebrow">SAYFA ${i + 1} / ${pages.length}</small>${done ? '<span class="got">💧 alındı</span>' : '<span class="todo">+1 💧</span>'}</div>
+  return `<div class="reader-top">${back('kitap/' + b.id, b.name)}<div class="reader-tools"><button type="button" data-font="-1" aria-label="Yazıyı küçült">A−</button><button type="button" data-font="1" aria-label="Yazıyı büyüt">A+</button><button type="button" data-listen aria-label="Sayfayı dinle"><img class="ic" src="assets/ikon/hoparlor.png" alt=""> Dinle</button></div></div>
+  <article class="panel reading ${img ? 'has-img' : ''}" style="--fs:${font}px"><div class="page-meta"><small class="eyebrow">SAYFA ${i + 1} / ${pages.length}</small>${done ? '<span class="got"><img class="ic" src="assets/ikon/damla.png" alt=""> alındı</span>' : '<span class="todo">+1 <img class="ic" src="assets/ikon/damla.png" alt=""></span>'}</div>
   <div class="page-dots" aria-hidden="true">${pages.map((_, k) => `<i class="${Journal.has(b.id, 'page', 'p' + k) ? 'read' : ''} ${k === i ? 'here' : ''}"></i>`).join('')}</div>
   ${img ? `<img class="scene" src="${asset(img)}" alt="">` : ''}<div class="page-text"><h1>${title || b.name}</h1>${paras.map(p => '<p>' + p + '</p>').join('')}</div>
   <div class="actions">${i ? btn('oku/' + b.id + '/' + (i - 1), '‹ Önceki', 'back') : ''}<button class="cta primary" data-page="${i}">${i === pages.length - 1 ? 'Okudum, kitabı bitir' : 'Okudum, sayfayı çevir ›'}</button></div></article>`;
@@ -124,14 +124,14 @@ function readerFont() { try { return Number(localStorage.getItem('okumino-yazi')
 
 function finishedBook(b) {
   const read = bookPagesRead(b.id), length = readerBooks[b.id].length;
-  return `<div class="panel center"><span class="big-emoji" aria-hidden="true">🎉</span><small class="eyebrow">${b.name}</small><h1>${read >= length ? 'Son sayfaya geldin!' : 'Bölümün sonu'}</h1><p>${read}/${length} sayfa okudun.${read < length ? ' Atladığın sayfalar fidanını bekliyor.' : ' Fidanın bu kitapla ' + length + ' damla içti.'}</p><div class="actions center">${btn('etkinlikler/' + b.id, 'Etkinlik seç')}${btn('profil', 'Fidanımı gör', 'cta')}</div></div>`;
+  return `<div class="panel center"><span class="big-emoji" aria-hidden="true"><img class="ic" src="assets/ikon/konfeti.png" alt=""></span><small class="eyebrow">${b.name}</small><h1>${read >= length ? 'Son sayfaya geldin!' : 'Bölümün sonu'}</h1><p>${read}/${length} sayfa okudun.${read < length ? ' Atladığın sayfalar fidanını bekliyor.' : ' Fidanın bu kitapla ' + length + ' damla içti.'}</p><div class="actions center">${btn('etkinlikler/' + b.id, 'Etkinlik seç')}${btn('profil', 'Fidanımı gör', 'cta')}</div></div>`;
 }
 
 function activityMenu(b, justDone) {
   const done = id => Journal.has(b.id, 'task', id);
-  const workshop = b.id === 'pinokyo' ? workshopLabels.map((name, i) => `<a class="task ${done('atolye-' + i) ? 'done' : ''}" href="pinokyo/index.html?serbest=${i}"><img src="pinokyo/assets/icons/${workshopIcons[i]}.png" alt=""><span><b>${name}</b><small>Atölye · ${done('atolye-' + i) ? 'Tamamlandı' : '+2 💧'}</small></span></a>`).join('') : '';
-  const questions = b.stops.map((s, i) => `<a class="task ${done('soru-' + i) ? 'done' : ''}" href="#soru/${b.id}/${i}"><img src="pinokyo/assets/icons/thinking.png" alt=""><span><b>${s[0]}</b><small>Hikâye sorusu · ${done('soru-' + i) ? 'Tamamlandı' : '+2 💧'}</small></span></a>`).join('');
-  return back('kitap/' + b.id, b.name) + `${justDone ? '<p class="banner-ok" role="status">Etkinlik tamam! Fidanına 2 damla gitti 💧💧</p>' : ''}<h1>Etkinlik seç</h1><p>${b.name} · İstediğinden başla, sıra yok.</p><div class="tasks">${workshop}${questions}</div>`;
+  const workshop = b.id === 'pinokyo' ? workshopLabels.map((name, i) => `<a class="task ${done('atolye-' + i) ? 'done' : ''}" href="pinokyo/index.html?serbest=${i}"><img src="assets/ikon/${workshopIcons[i]}.png" alt=""><span><b>${name}</b><small>Atölye · ${done('atolye-' + i) ? 'Tamamlandı' : '+2 <img class="ic" src="assets/ikon/damla.png" alt="">'}</small></span></a>`).join('') : '';
+  const questions = b.stops.map((s, i) => `<a class="task ${done('soru-' + i) ? 'done' : ''}" href="#soru/${b.id}/${i}"><img src="assets/ikon/soru.png" alt=""><span><b>${s[0]}</b><small>Hikâye sorusu · ${done('soru-' + i) ? 'Tamamlandı' : '+2 <img class="ic" src="assets/ikon/damla.png" alt="">'}</small></span></a>`).join('');
+  return back('kitap/' + b.id, b.name) + `${justDone ? '<p class="banner-ok" role="status">Etkinlik tamam! Fidanına 2 damla gitti <img class="ic" src="assets/ikon/damla.png" alt=""><img class="ic" src="assets/ikon/damla.png" alt=""></p>' : ''}<h1>Etkinlik seç</h1><p>${b.name} · İstediğinden başla, sıra yok.</p><div class="tasks">${workshop}${questions}</div>`;
 }
 
 function question(b, i) {
@@ -164,5 +164,25 @@ function profile(steps) {
   <div class="row"><h2>Kitaplarım</h2>${btn('pasaport', 'Pasaportum', 'link')}</div>
   <div class="book-progress">${books.map(b => { const r = bookPagesRead(b.id), t = readerBooks[b.id].length, p = sum.perBook[b.id]; return `<a href="#kitap/${b.id}" class="bp"><img src="${asset(b.id)}" alt=""><span><b>${b.name}</b><small>${r}/${t} sayfa · ${p ? p.tasks : 0} etkinlik</small><div class="minibar"><i style="width:${r / t * 100}%"></i></div></span></a>`; }).join('')}</div>
   <div class="row"><h2>Okuma günlüğüm</h2></div>
-  ${sum.list.length ? `<ol class="log">${sum.list.slice(0, 12).map(e => `<li><span class="log-dot">${e.type === 'page' ? '💧' : '🧩'}</span><span><b>${e.title}</b><small>${(books.find(b => b.id === e.book) || {}).name || ''} · ${new Date(e.time).toLocaleDateString('tr-TR', {weekday: 'long', day: 'numeric', month: 'long'})}</small></span></li>`).join('')}</ol>` : '<p class="muted">Okuduğun ilk sayfa ya da bitirdiğin ilk etkinlik burada görünecek.</p>'}`;
+  ${sum.list.length ? `<ol class="log">${sum.list.slice(0, 12).map(e => `<li><span class="log-dot">${e.type === 'page' ? '<img class="ic" src="assets/ikon/damla.png" alt="">' : '<img class="ic" src="assets/ikon/yapboz.png" alt="">'}</span><span><b>${e.title}</b><small>${(books.find(b => b.id === e.book) || {}).name || ''} · ${new Date(e.time).toLocaleDateString('tr-TR', {weekday: 'long', day: 'numeric', month: 'long'})}</small></span></li>`).join('')}</ol>` : '<p class="muted">Okuduğun ilk sayfa ya da bitirdiğin ilk etkinlik burada görünecek.</p>'}`;
+}
+
+
+// Hoş geldin: okumino.app'teki okuma odası, uygulama açılırken bir kez.
+// Pencere önündeki rafta kaldığın kitabın kapağı ve öbür kitapların sırtları durur.
+const SOON = [['Oz Büyücüsü', '#1f9e8a'], ['Beyaz Diş', '#c7376b'], ['Define Adası', '#3f9a46'], ['Pollyanna', '#7b4fc9']];
+const SPINE = {pinokyo: '#e0532b', heidi: '#2f62d8', alice: '#f1a516', 'kucuk-prens': '#1f3f99'};
+function welcomeScreen(sum, current) {
+  const h = new Date().getHours(), night = h >= 19 || h < 7;
+  const others = books.filter(b => b.id !== current.id);
+  const spines = others.map((b, i) => `<a class="spine" href="#kitap/${b.id}" style="--c:${SPINE[b.id]};--h:${[88, 96, 84][i % 3]}%"><b>${b.id === 'alice' ? 'Alice' : b.name}</b><small>${b.author.split(' ').slice(-1)[0]}</small></a>`).join('')
+    + SOON.map(([t, c], i) => `<button type="button" class="spine soon" data-soon="${t}" style="--c:${c};--h:${[92, 82, 98, 86][i]}%"><b>${t}</b><small>Yakında</small></button>`).join('');
+  const back = Journal.bookmark(current.id) || sum.pages;
+  return `<section class="welcome ${night ? 'night' : ''}">
+  <div class="w-top"><img src="assets/okumino_logo.webp" alt="Okumino"></div>
+  <h1>Bir kitap seç. <span>Macera başlasın.</span></h1>
+  <div class="w-shelf"><a class="w-cover" href="#kitap/${current.id}"><img src="${asset(current.id)}" alt="${current.name}"></a>${spines}</div>
+  <img class="w-mino" src="assets/mino_selam.webp" alt="Mino el sallıyor">
+  <p class="w-hello">${night ? 'İyi akşamlar!' : 'Merhaba!'} ${sum.streak ? sum.streak + ' gündür okuyorsun, harikasın!' : 'Bugün hangi kitabı açalım?'}</p>
+  <div class="w-actions">${back ? btn(readerLink(current), 'Kaldığın yerden: ' + current.name, 'cta primary big') : ''}${btn('oda', 'Okuma odama gir ›', 'cta big')}</div></section>`;
 }

@@ -21,19 +21,19 @@ const Notify = (() => {
     const left = Math.max(0, s.goal - s.todayDrops);
     const read = '#oku/' + b.id + '/' + page;
     const badge = badgeList(s, appSteps()).filter(x => !x.on && x.need - x.have <= 2).sort((x, y) => (x.need - x.have) - (y.need - y.have))[0];
-    if (slot === 'sabah') return {icon: '🌱', title: 'Günaydın! Fidanın uyandı', body: `Bugün ${s.goal} damla istiyor. Okula gitmeden tek sayfa bile yeter.`, link: read};
-    if (slot === 'okul') return {icon: '🦊', title: 'Mino seni bekliyor', body: `${b.name}, ${page + 1}. sayfada kaldın. 5 dakikalık bir okuma molası?`, link: read};
+    if (slot === 'sabah') return {icon: '<img class="ic" src="assets/ikon/fidan.png" alt="">', title: 'Günaydın! Fidanın uyandı', body: `Bugün ${s.goal} damla istiyor. Okula gitmeden tek sayfa bile yeter.`, link: read};
+    if (slot === 'okul') return {icon: '<img class="ic" src="assets/ikon/kitap.png" alt="">', title: 'Mino seni bekliyor', body: `${b.name}, ${page + 1}. sayfada kaldın. 5 dakikalık bir okuma molası?`, link: read};
     if (slot === 'aksam') {
-      if (!left) return {icon: '🌳', title: 'Bugünün hedefi tamam!', body: `Fidanın bugün ${s.todayDrops} damla içti. Yarın görüşürüz.`, link: '#profil'};
-      if (s.streak) return {icon: '🔥', title: `${s.streak} günlük serin devam etsin`, body: `Bugün ${left} damla daha. Bir sayfa = bir damla.`, link: read};
-      return {icon: '💧', title: 'Fidanın biraz susadı', body: 'Bir sayfa okursan bir damla alır. Yarın yeniden başlamak da olur.', link: read};
+      if (!left) return {icon: '<img class="ic" src="assets/ikon/agac.png" alt="">', title: 'Bugünün hedefi tamam!', body: `Fidanın bugün ${s.todayDrops} damla içti. Yarın görüşürüz.`, link: '#profil'};
+      if (s.streak) return {icon: '<img class="ic" src="assets/ikon/alev.png" alt="">', title: `${s.streak} günlük serin devam etsin`, body: `Bugün ${left} damla daha. Bir sayfa = bir damla.`, link: read};
+      return {icon: '<img class="ic" src="assets/ikon/damla.png" alt="">', title: 'Fidanın biraz susadı', body: 'Bir sayfa okursan bir damla alır. Yarın yeniden başlamak da olur.', link: read};
     }
     if (slot === 'rozet') return badge
       ? {icon: badge.icon, title: `${badge.title} rozetine çok az kaldı`, body: `${badge.hint}. ${badge.need - badge.have} adım kaldı.`, link: '#profil'}
-      : {icon: '🏅', title: 'Yeni bir rozet seni bekliyor', body: 'Profilinde hangi rozete yakın olduğunu gör.', link: '#profil'};
+      : {icon: '<img class="ic" src="assets/ikon/madalya.png" alt="">', title: 'Yeni bir rozet seni bekliyor', body: 'Profilinde hangi rozete yakın olduğunu gör.', link: '#profil'};
     if (slot === 'durak') {
       const steps = appSteps()[b.id] || 0;
-      return {icon: '🗺️', title: `${b.name} patikasında yeni durak`, body: steps >= 2 ? 'İkinci durak açıldı. Mino haritada seni bekliyor.' : 'İlk durağın hazır. Damganı kazanmaya ne dersin?', link: '#patika/' + b.id};
+      return {icon: '<img class="ic" src="assets/ikon/harita.png" alt="">', title: `${b.name} patikasında yeni durak`, body: steps >= 2 ? 'İkinci durak açıldı. Mino haritada seni bekliyor.' : 'İlk durağın hazır. Damganı kazanmaya ne dersin?', link: '#patika/' + b.id};
     }
     return compose('okul');
   }
@@ -67,7 +67,7 @@ const Notify = (() => {
     const items = list();
     markRead();
     return `<h1>Bildirimler</h1><p class="muted">Okumino günde en çok iki kez hatırlatır. Saatleri velin ayarlar.</p>
-    ${items.length ? `<div class="notes">${items.map(n => `<a class="note ${n.read ? '' : 'new'}" href="${n.link}"><span class="note-icon">${n.icon}</span><span><b>${n.title}</b><small>${n.body}</small></span><time>${n.time}</time></a>`).join('')}</div>` : '<div class="panel center"><span class="big-emoji">🔔</span><p>Henüz bildirim yok. Fidanın seni çağırınca burada görünecek.</p></div>'}
+    ${items.length ? `<div class="notes">${items.map(n => `<a class="note ${n.read ? '' : 'new'}" href="${n.link}"><span class="note-icon">${n.icon}</span><span><b>${n.title}</b><small>${n.body}</small></span><time>${n.time}</time></a>`).join('')}</div>` : '<div class="panel center"><span class="big-emoji"><img class="ic" src="assets/ikon/zil.png" alt=""></span><p>Henüz bildirim yok. Fidanın seni çağırınca burada görünecek.</p></div>'}
     <div class="panel schedule"><h2>Bildirim saatlerim</h2>${[['sabah', 'Sabah', '07:45'], ['okul', 'Okul sonrası', '16:30'], ['aksam', 'Akşam', '19:30']].map(([k, l, t]) => `<div class="sched"><span><b>${l}</b><small>${t}</small></span><button type="button" data-try="${k}">Şimdi dene</button></div>`).join('')}</div>`;
   }
   // Cihaz önizlemesinin dışındaki panel bu çerçeveye mesaj gönderir.

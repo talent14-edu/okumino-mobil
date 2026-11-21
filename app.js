@@ -27,7 +27,7 @@ function cards(list){return list.map(b=>{const r=bookPagesRead(b.id),t=readerBoo
 
 // Üst çubuk: logo, bugünün damlaları, bildirim zili. Tek bakışta üç şey, fazlası değil.
 function header(sum){
- bar.innerHTML=`<a href="#oda" aria-label="Okumino ana sayfa"><img src="assets/okumino_logo.webp" alt="Okumino"></a><div class="top-right"><a class="drop-chip" href="#profil" aria-label="Bugün ${sum.todayDrops} / ${sum.goal} damla, ${sum.streak} gün seri"><span>💧 ${sum.todayDrops}/${sum.goal}</span>${sum.streak?`<span class="streak">🔥 ${sum.streak}</span>`:''}</a><a class="bell" href="#bildirimler" aria-label="Bildirimler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><i hidden></i></a></div>`;
+ bar.innerHTML=`<a href="#oda" aria-label="Okumino ana sayfa"><img src="assets/okumino_logo.webp" alt="Okumino"></a><div class="top-right"><a class="drop-chip" href="#profil" aria-label="Bugün ${sum.todayDrops} / ${sum.goal} damla, ${sum.streak} gün seri"><span><img class="ic" src="assets/ikon/damla.png" alt=""> ${sum.todayDrops}/${sum.goal}</span>${sum.streak?`<span class="streak"><img class="ic" src="assets/ikon/alev.png" alt=""> ${sum.streak}</span>`:''}</a><a class="bell" href="#bildirimler" aria-label="Bildirimler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><i hidden></i></a></div>`;
  Notify.paintBell();
 }
 
@@ -42,18 +42,21 @@ function celebrate(sum){
  const gained=sum.drops-seen.drops, fresh=earned.filter(b=>!seen.badges.includes(b));
  if(sum.level>seen.level) return modal(`<div class="grow-anim">${plantSVG(sum)}</div><small class="eyebrow">FİDANIN BÜYÜDÜ</small><h2>Artık bir ${sum.stage.name.toLocaleLowerCase('tr')}!</h2><p>${sum.next?`Sırada ${sum.next.name}: ${sum.next.at-sum.drops} damla kaldı.`:'Fidanın meyve verdi. Harika bir okur oldun!'}</p>${fresh.length?`<p class="muted">Yeni rozet: ${fresh.join(', ')}</p>`:''}<button class="cta primary" data-close>Okumaya devam</button>`);
  if(fresh.length){const b=badgeList(sum,state.steps).find(x=>x.title===fresh[0]);return modal(`<span class="big-emoji pop">${b.icon}</span><small class="eyebrow">YENİ ROZET</small><h2>${b.title}</h2><p>${b.hint}: tamam!</p><button class="cta primary" data-close>Harika!</button>`)}
- if(gained>0)toast(`+${gained} damla 💧 Fidanın büyüyor`);
+ if(gained>0)toast(`+${gained} damla <img class="ic" src="assets/ikon/damla.png" alt=""> Fidanın büyüyor`);
 }
-function toast(text){let t=document.querySelector('.toast');if(!t){t=document.createElement('p');t.className='toast';t.setAttribute('role','status');document.body.append(t)}t.textContent=text;t.classList.remove('show');void t.offsetWidth;t.classList.add('show')}
+function toast(text){let t=document.querySelector('.toast');if(!t){t=document.createElement('p');t.className='toast';t.setAttribute('role','status');document.body.append(t)}t.innerHTML=text;t.classList.remove('show');void t.offsetWidth;t.classList.add('show')}
 function modal(html){document.querySelectorAll('dialog.celebrate').forEach(x=>x.remove());const d=document.createElement('dialog');d.className='celebrate';d.innerHTML=html;document.body.append(d);d.showModal();d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]')){d.close();d.remove()}})}
 
 function render(){
  load();
+ let welcomed=false;try{welcomed=!!sessionStorage.getItem('okumino-karsilandi')}catch{}
+ if(!location.hash&&!welcomed){history.replaceState(null,'','#hosgeldin')}
  const [route='oda',id,index]=location.hash.slice(1).split('/').map(x=>x?decodeURIComponent(x):undefined);
+ if(route!=='hosgeldin'){try{sessionStorage.setItem('okumino-karsilandi','1')}catch{};Notify.autoplay()}
  const b=books.find(x=>x.id===id)||books.find(x=>x.id===state.selected);
  const n=count(b), done=Math.floor(n/2), path='patika/'+b.id;
  const section=['kitap','raf','oku','etkinlikler','soru','tamam'].includes(route)?'raf':['patika','durak','sonuc'].includes(route)?'patika':['profil','pasaport'].includes(route)?'profil':route;
- nav.innerHTML=Object.entries({oda:['Odam','house_garden'],raf:['Kitaplığım','books'],patika:['Patikam','ship'],profil:['Profilim','tree']}).map(([key,[title,ic]])=>`<a href="#${key}" ${key===section?'aria-current="page"':''}><img src="pinokyo/assets/icons/${ic}.png" alt="">${title}</a>`).join('');
+ nav.innerHTML=Object.entries({oda:['Odam','ev'],raf:['Kitaplığım','kitaplar'],patika:['Patikam','harita'],profil:['Profilim','fidan']}).map(([key,[title,ic]])=>`<a href="#${key}" ${key===section?'aria-current="page"':''}><img src="assets/ikon/${ic}.png" alt="">${title}</a>`).join('');
  const sum=Journal.summary();
  header(sum);
  document.body.dataset.route=route;
@@ -82,6 +85,8 @@ function render(){
  screen.innerHTML=`<div class="panel center"><small class="eyebrow">Okuma pasaportu</small><h1>Damgan hazır!</h1><div class="stamp">✦ &nbsp; ${b.name} · ${done}. durak</div><p>${done===1?'İkinci durağın açıldı.':'Bu kitabın iki örnek durağını tamamladın.'}</p>${btn(path,'Patikayı gör')}</div>`;
  }else if(route==='pasaport'){
  const stamps=books.flatMap(x=>x.stops.slice(0,Math.floor(count(x)/2)).map((s,i)=>`<div class="stamp">✦ &nbsp; ${x.name} · ${i+1}. durak<br><small>${s[0]}</small></div>`));screen.innerHTML=back('profil','Profilim')+`<h1>Pasaportum</h1><p>${stamps.length?'Tamamladığın duraklardan damgaların.':'İlk durağını tamamladığında damgan burada görünecek.'}</p>${stamps.join('')}${btn(path,'Patikama git')}`;
+ }else if(route==='hosgeldin'){
+ screen.innerHTML=welcomeScreen(sum,books.find(x=>x.id===(sum.list.find(e=>e.type==='page')||{}).book)||b);
  }else if(route==='profil'){
  screen.innerHTML=profile(state.steps);
  }else if(route==='bildirimler'){
@@ -90,11 +95,12 @@ function render(){
  const readBook=books.find(x=>x.id===(sum.list.find(e=>e.type==='page')||{}).book)||b;
  screen.innerHTML=homeScreen(sum,readBook,b,state.steps);
  }
- celebrate(sum);
+ if(route!=='hosgeldin')celebrate(sum);
  screen.onclick=e=>{const t=e.target.closest('button');if(!t)return;
  if(t.dataset.filter){filter=t.dataset.filter;render();screen.querySelector('[aria-pressed=true]').focus();return}
  if(t.dataset.try){Notify.push(t.dataset.try);return}
- if(t.dataset.locked){toast('🔒 '+t.dataset.locked);t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake');return}
+ if(t.dataset.soon){toast(t.dataset.soon+' yakında rafta!');return}
+ if(t.dataset.locked){toast('<img class="ic" src="assets/ikon/kilit.png" alt=""> '+t.dataset.locked);t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake');return}
  if(t.dataset.font){const f=Math.max(16,Math.min(26,readerFont()+Number(t.dataset.font)*2));try{localStorage.setItem('okumino-yazi',f)}catch{};screen.querySelector('.reading').style.setProperty('--fs',f+'px');return}
  if(t.hasAttribute('data-listen')){speak(t);return}
  if(t.dataset.page!==undefined){
@@ -124,10 +130,9 @@ function render(){
 // Sayfayı Türkçe sesle okur (tarayıcının kendi sesi); tekrar basınca susar.
 function speak(button){
  if(!('speechSynthesis' in window))return toast('Bu cihazda sesli okuma yok.');
- if(speechSynthesis.speaking){speechSynthesis.cancel();button.textContent='🔊 Dinle';return}
+ if(speechSynthesis.speaking){speechSynthesis.cancel();button.innerHTML='<img class="ic" src="assets/ikon/hoparlor.png" alt=""> Dinle';return}
  const u=new SpeechSynthesisUtterance(screen.querySelector('.page-text').innerText);u.lang='tr-TR';u.rate=.9;
- u.onend=()=>{button.textContent='🔊 Dinle'};button.textContent='⏸ Durdur';speechSynthesis.speak(u);
+ u.onend=()=>{button.innerHTML='<img class="ic" src="assets/ikon/hoparlor.png" alt=""> Dinle'};button.innerHTML='⏸ Durdur';speechSynthesis.speak(u);
 }
 window.addEventListener('hashchange',()=>{window.speechSynthesis?.cancel();render();window.scrollTo(0,0);screen.focus({preventScroll:true})});
 render();
-Notify.autoplay();
