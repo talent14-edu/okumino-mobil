@@ -1,5 +1,8 @@
 <!doctype html>
 <html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Okumino · Cihaz önizlemesi</title><link rel="icon" href="assets/okumino_ikon.png"><link rel="stylesheet" href="cihaz.css"><script defer src="cihaz.js"></script></head>
-<body><header><div class="brand"><img src="assets/okumino_logo.webp" alt="Okumino"><span>Cihaz önizlemesi</span></div>
-<div class="switch" role="group" aria-label="Önizleme cihazı"><button data-device="telefon" aria-pressed="true"><i></i>Telefon</button><button data-device="tablet" aria-pressed="false"><i></i>Tablet</button></div><output aria-live="polite">390 × 844</output></header>
+<body><header><div class="bar"><div class="brand"><img src="assets/okumino_logo.webp" alt="Okumino"><span>Cihaz önizlemesi</span></div>
+<div class="switch" role="group" aria-label="Önizleme cihazı"><button data-device="telefon" aria-pressed="true"><i></i>Telefon</button><button data-device="tablet" aria-pressed="false"><i></i>Tablet</button></div><output aria-live="polite">390 × 844</output></div>
+<div class="sim" role="group" aria-label="Günlük bildirim simülasyonu"><b>Bildirim gönder</b>
+<button data-notify="sabah">07:45 Sabah</button><button data-notify="okul">16:30 Okul sonrası</button><button data-notify="durak">17:15 Yeni durak</button><button data-notify="rozet">18:00 Rozete az kaldı</button><button data-notify="aksam">19:30 Akşam</button>
+<span class="sep"></span><button data-demo="seed" class="alt">Demo: 1 haftalık okur</button><button data-demo="reset" class="alt">Sıfırla</button><a href="arastirma.html">Ekran araştırması</a></div></header>
 <main><div class="stage"><div class="device"><iframe title="Okumino uygulaması" allow="microphone; fullscreen" allowfullscreen></iframe></div></div></main></body></html>

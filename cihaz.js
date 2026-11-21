@@ -26,3 +26,8 @@ for(const button of document.querySelectorAll('[data-device]')) button.onclick=(
 frame.src='oda.html'+location.hash;
 window.addEventListener('resize',layout);
 layout();
+// Bildirim ve demo düğmeleri telefondaki uygulamaya mesaj gönderir.
+for(const b of document.querySelectorAll('[data-notify],[data-demo]')) b.onclick=()=>{
+  if(b.dataset.demo==='reset' && !confirm('Bu tarayıcıdaki Okumino ilerlemesi silinsin mi?')) return;
+  frame.contentWindow.postMessage({type:'okumino',notify:b.dataset.notify,demo:b.dataset.demo},'*');
+};

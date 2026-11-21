@@ -7,7 +7,14 @@
   const escape = text => String(text).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const storageKey = 'okumino-mobil-pinokyo-atolye-v1';
-  const libraryUrl = '../oda.html#patika/pinokyo';
+  // ?serbest=N: the student opened one activity from the free menu, not the path.
+  const freeStage = (() => { const v = new URLSearchParams(location.search).get('serbest'); return v !== null && /^[0-5]$/.test(v) ? Number(v) : null; })();
+  const libraryUrl = freeStage === null ? '../oda.html#patika/pinokyo' : '../oda.html#etkinlikler/pinokyo';
+  // Every finished activity lands in the shared reading journal (profile, sapling, badges).
+  function journal(stage) {
+    const key = 'okumino-gunluk-v1/pinokyo/task/atolye-' + stage;
+    try { if (!localStorage.getItem(key)) localStorage.setItem(key, JSON.stringify({ book: 'pinokyo', type: 'task', id: 'atolye-' + stage, title: 'Atölye · ' + labels[stage], time: Date.now() })); } catch (_) {}
+  }
   const labels = ['Hayal et', 'Kelime sandığı', 'Hikâye zamanı', 'Dedektif Mino', 'Ses stüdyosu', 'Filmini kur'];
   const notes = ['Sence neler olabilir?', 'Her kelime bir ipucu.', 'Acele etme. Hikâye seni bekler.', 'Cevap, hikâyenin içinde.', 'Bu kez Gepetto’nun sesi sensin.', 'Hikâyeyi bir de sen anlat.'];
   const introChoices = [
@@ -54,6 +61,7 @@ Kuklanın ayakları henüz hazır değildi. Gepetto onu yeniden tezgâha oturttu
       }
     }
   } catch (_) { /* This lesson also works without browser storage. */ }
+  if (freeStage !== null) { state.stage = freeStage; state.furthest = Math.max(state.furthest, freeStage); }
   const panel = $('#panel');
   let readingPages = [], readingPage = 0, paginateFrame = 0;
   let toastTimer, speechActive = false, filmTimer, filmMode = false, filmIndex = 0, filmPlaying = false;
@@ -137,9 +145,11 @@ Kuklanın ayakları henüz hazır değildi. Gepetto onu yeniden tezgâha oturttu
     stopRecording(true);
     clearTimeout(filmTimer);
     filmMode = false; filmPlaying = false;
+    const from = state.stage;
     state.stage = Math.max(0, Math.min(6, stage));
+    if (state.stage > from) journal(from);
     state.furthest = Math.max(state.furthest, state.stage);
-    if (state.stage === 6) {
+    if (state.stage === 6 && freeStage === null) {
       try {
         const key = 'okumino-mobil-v1';
         const progress = JSON.parse(localStorage.getItem(key)) || {steps:{}};
@@ -162,6 +172,8 @@ Kuklanın ayakları henüz hazır değildi. Gepetto onu yeniden tezgâha oturttu
       if (!filmMode) { filmMode = true; filmIndex = 0; filmPlaying = !reduced.matches; render(true); return; }
     }
     if (state.stage === 6) { location.href = libraryUrl; return; }
+    // Free mode: one chosen activity, then back to the activity menu.
+    if (freeStage !== null) { journal(state.stage); stopSpeech(); stopRecording(true); location.href = libraryUrl + '/bitti'; return; }
     go(state.stage + 1);
   }
   function previous() {
@@ -306,6 +318,7 @@ Kuklanın ayakları henüz hazır değildi. Gepetto onu yeniden tezgâha oturttu
     switch (action) {
       case 'demo-skip':
         state.previewUsed = true;
+        if (freeStage !== null && state.stage < 6) { journal(state.stage); location.href = libraryUrl + '/bitti'; break; }
         if (state.stage === 5 && !filmMode) {
           filmMode = true; filmIndex = 0; filmPlaying = !reduced.matches;
           render(true);
