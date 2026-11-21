@@ -52,15 +52,51 @@ function badgeList(sum, steps) {
   ].map(b => ({...b, on: b.have >= b.need}));
 }
 
-// Ana odadaki "Bugün" kartı: fidan, günlük hedef, kaldığın yer — tek bakışta.
+// Ana oda. Tablette tek ekrana sığar (kaydırma yok): solda Mino + fidan + bugünün hedefi,
+// sağda patikadaki sıradaki durak, altta kitap rafı.
 function todayCard(sum, b) {
   const left = Math.max(0, sum.goal - sum.todayDrops);
-  const pct = Math.min(1, sum.todayDrops / sum.goal);
-  return `<section class="today"><a class="today-plant" href="#profil" aria-label="Fidanımı gör">${plantSVG(sum, 'mini')}</a>
-  <div class="today-body"><small class="eyebrow">BUGÜN</small><h2>${left ? 'Fidanın ' + left + ' damla bekliyor' : 'Bugünün hedefi tamam!'}</h2>
-  <div class="drops" aria-label="Bugün ${sum.todayDrops} / ${sum.goal} damla">${Array.from({length: sum.goal}, (_, i) => `<i class="${i < sum.todayDrops ? 'full' : ''}"></i>`).join('')}<span>${sum.streak ? '🔥 ' + sum.streak + ' gün seri' : 'Seriye bugün başla'}</span></div>
-  <p class="muted">Bir sayfa = 1 damla · Bir etkinlik = 2 damla</p>
-  ${btn(readerLink(b), Journal.bookmark(b.id) ? b.name + ' · Kaldığın yerden' : b.name + ' · Okumaya başla')}</div><div class="ring" style="--p:${pct}" aria-hidden="true"><b>${sum.todayDrops}/${sum.goal}</b></div></section>`;
+  const hello = left === sum.goal ? `Merhaba! Fidanın bugün <b>${sum.goal} damla</b> bekliyor.` : left ? `Süpersin! <b>${left} damla</b> daha, fidan çok mutlu olacak.` : 'Bugünün hedefi tamam! Fidanın kocaman gülümsüyor.';
+  return `<section class="today">
+  <div class="mino-say"><img src="pinokyo/assets/mino.webp" alt="Mino"><p class="bubble">${hello}</p></div>
+  <div class="today-main"><a class="today-plant" href="#profil" aria-label="Fidanımı gör">${plantSVG(sum, 'mini')}<span>${sum.stage.name}</span></a>
+  <div class="today-body"><div class="drops" aria-label="Bugün ${sum.todayDrops} / ${sum.goal} damla">${Array.from({length: sum.goal}, (_, i) => `<i class="${i < sum.todayDrops ? 'full' : ''}"></i>`).join('')}</div>
+  <p class="streak-line">${sum.streak ? '🔥 <b>' + sum.streak + ' gün</b> üst üste okudun' : '🌱 Bugün okursan serin başlar'}</p>
+  ${btn(readerLink(b), '📖 ' + (Journal.bookmark(b.id) ? 'Kaldığın yerden: ' : 'Okumaya başla: ') + b.name, 'cta primary big')}</div></div></section>`;
+}
+function homeScreen(sum, readBook, pathBook, steps) {
+  const done = Math.floor(Math.min(4, Number(steps[pathBook.id]) || 0) / 2);
+  const next = pathBook.stops[done];
+  const dots = Array.from({length: Math.min(5, pathBook.total)}, (_, i) => `<i class="${i < done ? 'done' : i === done && next ? 'now' : ''}">${i < done ? '✓' : i === done && next ? '★' : ''}</i>`).join('');
+  return `<div class="home">${todayCard(sum, readBook)}
+  <a class="pathcard" href="#patika/${pathBook.id}"><small class="eyebrow">PATİKAM</small><div class="pc-top"><img src="${asset(pathBook.id)}" alt=""><div><h3>${pathBook.name}</h3><small>${done}/${pathBook.total} durak</small></div></div>
+  <div class="mini-path" aria-hidden="true">${dots}</div><p>${next ? 'Sıradaki durak: <b>' + next[0] + '</b>' : 'Örnek duraklar bitti. Yenileri yakında!'}</p><span class="cta big">${next ? 'Durağa git' : 'Patikayı gör'} ›</span></a>
+  <section class="shelf-row"><div class="row"><h2>Kitap rafım</h2>${btn('raf', 'Tümünü gör', 'link')}</div><div class="shelf preview">${cards(books)}</div></section></div>`;
+}
+
+// Duolingo tarzı patika: duraklar zikzak çizerek aşağı iner. Örnekte her kitabın ilk iki
+// durağı oynanır; kalanlar kilitli görünür ki çocuk yolun uzunluğunu ve sonundaki kupayı görsün.
+const ZIGZAG = [0, -72, -108, -72, 0, 72, 108, 72];
+function pathScreen(b, done) {
+  const steps = [];
+  for (let i = 0; i < b.total; i++) {
+    const playable = i < b.stops.length, isDone = i < done, isNow = i === done && playable;
+    const x = ZIGZAG[i % ZIGZAG.length], side = x > 0 ? 'left' : 'right';
+    const chest = i === 3, last = i === b.total - 1;
+    const kind = last ? 'trophy' : chest ? 'chest' : 'stop';
+    const face = isDone ? '✓' : last ? '🏆' : chest ? '🎁' : isNow ? '<img src="pinokyo/assets/icons/open_book.png" alt="">' : '⭐';
+    const title = playable ? b.stops[i][0] : last ? 'Kitap kupası' : chest ? 'Hazine sandığı' : '';
+    const label = isNow ? `<div class="path-mino ${side}"><img src="pinokyo/assets/mino.webp" alt=""><span>${title}</span></div>` : title && (isDone || kind !== 'stop') ? `<span class="node-label ${side}">${title}</span>` : '';
+    const node = isDone || isNow
+      ? `<a class="node ${isDone ? 'done' : 'current'} ${kind}" href="#durak/${b.id}/${i}" aria-label="${i + 1}. durak: ${title}${isDone ? ', tamamlandı' : ''}">${face}</a>`
+      : `<button type="button" class="node locked ${kind}" data-locked="${playable ? 'Önce ' + i + '. durağı bitir.' : last ? 'Bütün durakları bitirince kupa senin!' : 'Bu durak yakında açılıyor.'}" aria-label="${i + 1}. durak, kilitli">${face}</button>`;
+    steps.push(`<div class="step" style="--x:${x}px">${isNow ? '<span class="start">BAŞLA!</span>' : ''}${node}${label}</div>`);
+  }
+  const switcher = books.map(x => `<a href="#patika/${x.id}" class="sw ${x.id === b.id ? 'on' : ''}" aria-label="${x.name} patikası"><img src="${asset(x.id)}" alt=""></a>`).join('');
+  return `<div class="path-page"><aside class="path-side"><div class="unit"><img src="${asset(b.id)}" alt=""><div><small>${b.level.toLocaleUpperCase('tr')} · ${b.total} DURAK</small><h1>${b.name}</h1><div class="unit-bar"><i style="width:${done / b.total * 100}%"></i></div><small>${done}/${b.total} durak tamam</small></div></div>
+  <div class="switcher" aria-label="Kitap değiştir">${switcher}</div>
+  <div class="side-tips">${btn('kitap/' + b.id, '📖 Kendi hızımda oku', 'cta')}${done ? btn('pasaport', '🏅 Damgalarım', 'cta soft') : ''}</div></aside>
+  <div class="path">${steps.join('')}</div></div>`;
 }
 
 function bookModes(b, n) {

@@ -53,7 +53,7 @@ function render(){
  const b=books.find(x=>x.id===id)||books.find(x=>x.id===state.selected);
  const n=count(b), done=Math.floor(n/2), path='patika/'+b.id;
  const section=['kitap','raf','oku','etkinlikler','soru','tamam'].includes(route)?'raf':['patika','durak','sonuc'].includes(route)?'patika':['profil','pasaport'].includes(route)?'profil':route;
- nav.innerHTML=Object.entries({oda:'Odam',raf:'Kitaplığım',patika:'Patikam',profil:'Profilim'}).map(([key,title])=>`<a href="#${key}" ${key===section?'aria-current="page"':''}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">${icons[key]}</svg>${title}</a>`).join('');
+ nav.innerHTML=Object.entries({oda:['Odam','house_garden'],raf:['Kitaplığım','books'],patika:['Patikam','ship'],profil:['Profilim','tree']}).map(([key,[title,ic]])=>`<a href="#${key}" ${key===section?'aria-current="page"':''}><img src="pinokyo/assets/icons/${ic}.png" alt="">${title}</a>`).join('');
  const sum=Journal.summary();
  header(sum);
  document.body.dataset.route=route;
@@ -71,7 +71,8 @@ function render(){
  screen.innerHTML=question(b,Number(index))||'';
  }else if(route==='patika'){
  state.selected=b.id;save();
- screen.innerHTML=back('kitap/'+b.id,b.name)+`<div class="detail"><img src="${asset(b.id)}" alt=""><div><small class="eyebrow">${b.level} · ${b.total} durak</small><h1>${b.name}</h1><b>${b.author}</b><p>${b.desc}</p></div></div><div class="row"><h2>Kitap patikası</h2><b>${done}/2 damga</b></div><small class="muted">Örnek patika · Kitabın ilk iki durağı</small><div class="map"><div class="map-guide"><img src="pinokyo/assets/mino.webp" alt="Mino"><div><b>Mino ile keşfet</b><p>${done===2?"İki damgan da hazır!":"Bir durağa dokun, hikâyeye katıl."}</p></div></div>${b.stops.map((s,i)=>{const locked=i>done,tag=locked?'div':'a';return `<${tag} class="stop ${locked?'locked':''}" ${locked?'':`href="#durak/${b.id}/${i}"`}><span class="num">${i<done?'✓':i+1}</span><span><small>${i+1}. DURAK · ${locked?'Önce 1. durağı bitir':i<done?'Tamamlandı · Tekrar oku':'Açık · Devam et'}</small><b>${s[0]}</b>${b.id==="pinokyo" && i===0?'<span class="mini-icons"><img src="pinokyo/assets/icons/light_bulb.png" alt=""><img src="pinokyo/assets/icons/books.png" alt=""><img src="pinokyo/assets/icons/clapper.png" alt="">6 etkinlik</span>':""}</span></${tag}>`}).join('')}</div>${done===2?btn('pasaport','Damgalarımı gör'):''}`;
+ screen.innerHTML=pathScreen(b,done);
+ requestAnimationFrame(()=>screen.querySelector('.node.current')?.scrollIntoView({block:'center'}));
  }else if(route==='durak'){
  const i=Number(index);if(![0,1].includes(i)||i>done){location.replace('#'+path);return}
  if(b.id==='pinokyo' && i===0){location.replace('pinokyo/index.html');return}
@@ -86,12 +87,14 @@ function render(){
  }else if(route==='bildirimler'){
  screen.innerHTML=Notify.center();Notify.paintBell();
  }else{
- screen.innerHTML=`${todayCard(sum,books.find(x=>x.id===(sum.list.find(e=>e.type==='page')||{}).book)||b)}<div class="row"><h2>Kitap patikam</h2></div><div class="pathcard"><img src="${asset(b.id)}" alt=""><div><small class="eyebrow">${b.level} · ${b.total} durak</small><h3>${b.name}</h3><small>${done===2?'Örnek patika tamamlandı':b.stops[done][0]}</small></div>${btn(path,'Patikayı aç')}</div><div class="row"><h2>Kitap rafım</h2>${btn('raf','Tümünü gör','link')}</div><div class="shelf preview">${cards(books)}</div>`;
+ const readBook=books.find(x=>x.id===(sum.list.find(e=>e.type==='page')||{}).book)||b;
+ screen.innerHTML=homeScreen(sum,readBook,b,state.steps);
  }
  celebrate(sum);
  screen.onclick=e=>{const t=e.target.closest('button');if(!t)return;
  if(t.dataset.filter){filter=t.dataset.filter;render();screen.querySelector('[aria-pressed=true]').focus();return}
  if(t.dataset.try){Notify.push(t.dataset.try);return}
+ if(t.dataset.locked){toast('🔒 '+t.dataset.locked);t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake');return}
  if(t.dataset.font){const f=Math.max(16,Math.min(26,readerFont()+Number(t.dataset.font)*2));try{localStorage.setItem('okumino-yazi',f)}catch{};screen.querySelector('.reading').style.setProperty('--fs',f+'px');return}
  if(t.hasAttribute('data-listen')){speak(t);return}
  if(t.dataset.page!==undefined){
